@@ -8,11 +8,16 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Activity = GarminExport.Activities.Model.Activity;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace GarminExport
 {
     class Program
     {
+        private const string EXPORT_DIR = "./export";
+
         static void Main(string[] args)
         {
 
@@ -65,10 +70,37 @@ namespace GarminExport
                 return;
             }
 
+            if (options.SaveActivityResult)
+            {
+                Console.WriteLine("Save activities json");
+                foreach (Activity activity in activities)
+                {
+                    var targetDirectory = FileUtils.CreateDirectoryIfNotExists(EXPORT_DIR);
+                    var json = JsonConvert.SerializeObject(activity);
+                    string filePath = targetDirectory.FullName + "/" + activity.ActivityId + ".json";
+                    using (FileStream streamWriter = File.Create(filePath))
+                    {
+                        var data = Encoding.ASCII.GetBytes(json);
+                        streamWriter.Write(data, 0, data.Length);
+                    }
+                    DateTime uploadTime = DateTime.Parse(activity.UploadDate.Display);
+                    FileInfo fileInfo = new FileInfo(filePath);
+                    fileInfo.CreationTime = uploadTime;
+                    fileInfo.LastWriteTime = uploadTime;
+                }
+            }
+
             DownloadService exportService = new DownloadService(authService.Session);
             foreach (var activity in activities)
             {
-                exportService.DownloadActivity(activity, "./export");
+                try
+                {
+                    exportService.DownloadActivity(activity, EXPORT_DIR);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Download activity failed:" + ex.Message);
+                }
             }
         }
     }

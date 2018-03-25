@@ -10,7 +10,7 @@ namespace GarminExport.Activities.Model
     public class ActivitySearchResultsContainer
     {
         [DataMember(Name = "results")]
-        public ActivitySearchResults Results { get; set; }
+        public Results Results { get; set; }
 
         public static ActivitySearchResultsContainer ParseJson(string json)
         {

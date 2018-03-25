@@ -6,7 +6,7 @@ using System.Text;
 namespace GarminExport.Activities.Model
 {
     [DataContract]
-    public class ActivitySearchResults
+    public class Results
     {
         [DataMember(Name = "activities")]
         public List<ActivityContainer> Activities { get; set; }
@@ -20,7 +20,10 @@ namespace GarminExport.Activities.Model
         [DataMember(Name = "totalPages")]
         public int TotalPages { get; set; }
 
-        public void Append(ActivitySearchResults results)
+        [DataMember(Name = "query")]
+        public Query Query { get; set; }
+
+        public void Append(Results results)
         {
             Activities.AddRange(results.Activities);
         }

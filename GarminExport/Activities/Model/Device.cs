@@ -6,7 +6,7 @@ using System.Text;
 namespace GarminExport.Activities.Model
 {
     [DataContract]
-    public class ActivityType
+    public class Device
     {
         [DataMember(Name = "display")]
         public string Display { get; set; }
@@ -14,10 +14,7 @@ namespace GarminExport.Activities.Model
         [DataMember(Name = "key")]
         public string Key { get; set; }
 
-        [DataMember(Name = "fieldNameDisplay")]
-        public string FieldNameDisplay { get; set; }
-
-        [DataMember(Name = "parent")]
-        public Parent Parent { get; set; }
+        [DataMember(Name = "version")]
+        public string Version { get; set; }
     }
 }

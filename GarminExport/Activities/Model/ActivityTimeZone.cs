@@ -5,21 +5,19 @@ using System.Text;
 
 namespace GarminExport.Activities.Model
 {
-    public class ActivityDate
+    [DataContract]
+    public class ActivityTimeZone
     {
         [DataMember(Name = "display")]
         public string Display { get; set; }
 
-        [DataMember(Name = "value")]
-        public string Value { get; set; }
+        [DataMember(Name = "key")]
+        public string Key { get; set; }
 
-        [DataMember(Name = "withDay")]
-        public string WithDay { get; set; }
+        [DataMember(Name = "fieldNameDisplay")]
+        public string FieldNameDisplay { get; set; }
 
         [DataMember(Name = "abbr")]
         public string Abbr { get; set; }
-
-        [DataMember(Name = "millis")]
-        public string Millis { get; set; }
     }
 }

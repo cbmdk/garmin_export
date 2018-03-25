@@ -21,19 +21,14 @@ namespace GarminExport.Activities
 
         public void DownloadActivity(Activity activity, String path)
         {
-            Console.WriteLine("Download activty {0}", activity.ActivityId)
+            Console.WriteLine("Download activty {0}", activity.ActivityId);
             WebRequest webRequest = WebRequest.Create("http://connect.garmin.com/proxy/download-service/files/activity/" + activity.ActivityId);
             HttpWebRequest httpWebRequest = webRequest as HttpWebRequest;
             httpWebRequest.CookieContainer = Session.Cookies;
 
             var response = httpWebRequest.GetResponse();
 
-            if (!path.EndsWith("/"))
-                path += "/";
-
-            DirectoryInfo targetDirectory = new DirectoryInfo(path);
-            if (!targetDirectory.Exists)
-                targetDirectory.Create();
+            var targetDirectory = FileUtils.CreateDirectoryIfNotExists(path);
 
             using (ZipInputStream inputStream = new ZipInputStream(response.GetResponseStream()))
             {
