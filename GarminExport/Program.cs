@@ -57,8 +57,7 @@ namespace GarminExport
             ActivitySearchService activitySearchService = new ActivitySearchService(authService.Session);
             var searchOptions = new ActivitySearchFilters
             {
-                FromDate = fromDate,
-                SortOrder = "asc"
+                StartDate = fromDate
             };
 
             Console.WriteLine("Search for activities from " + fromDate);
@@ -83,10 +82,9 @@ namespace GarminExport
                         var data = Encoding.ASCII.GetBytes(json);
                         streamWriter.Write(data, 0, data.Length);
                     }
-                    DateTime uploadTime = DateTime.Parse(activity.UploadDate.Display);
                     FileInfo fileInfo = new FileInfo(filePath);
-                    fileInfo.CreationTime = uploadTime;
-                    fileInfo.LastWriteTime = uploadTime;
+                    fileInfo.CreationTime = activity.StartTimeLocal;
+                    fileInfo.LastWriteTime = activity.StartTimeLocal;
                 }
             }
 

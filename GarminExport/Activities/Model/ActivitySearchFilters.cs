@@ -1,50 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
 
 namespace GarminExport.Activities.Model
 {
     public class ActivitySearchFilters
     {
-        public string Keyword { get; set; }
+        public string ActivityType { get; set; } //running
+        public string SortBy { get; set; } //startLocal
+        public string SortOrder { get; set; } //asc
+        public int? Limit { get; set; } //20
+        public int? Start { get; set; } //0
         public int? ActivityStartId { get; set; }
-        public int? Page { get; set; }
-        public int? ActivitiesPerPage { get; set; }
-        public string SortOrder { get; set; }
-        public string SortField { get; set; }
-        public string Explore { get; set; }
-        public bool? IgnoreNonGps { get; set; }
-        public bool? IgnoreUntitled { get; set; }
-        public string AggregateBy { get; set; }
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
+        public string Search { get; set; } //keyword 
+        public DateTime? StartDate { get; set; } //yyyy-MM-dd
+        public DateTime? EndDate { get; set; } //yyyy-MM-dd
 
         public string ToQueryString()
         {
+            //?startDate=2018-03-24&sortBy=startLocal&sortOrder=asc&limit=20&start=0
             NameValueCollection parameters = new NameValueCollection();
-            AddIfNotNull(parameters, "keyword", Keyword);
-            AddIfNotNull(parameters, "start", ActivityStartId);
-            AddIfNotNull(parameters, "currentPage", Page);
-            AddIfNotNull(parameters, "limit", ActivitiesPerPage);
-            AddIfNotNull(parameters, "sortField", SortField);
+            AddIfNotNull(parameters, "activityType", ActivityType);
+            AddIfNotNull(parameters, "sortBy", SortBy);
             AddIfNotNull(parameters, "sortOrder", SortOrder);
-            AddIfNotNull(parameters, "ignoreNonGps", IgnoreNonGps);
-            AddIfNotNull(parameters, "ignoreUntitled", IgnoreUntitled);
-            AddIfNotNull(parameters, "aggregateBy", AggregateBy);
-            AddIfNotNull(parameters, "explore", Explore);
+            AddIfNotNull(parameters, "limit", Limit);
+            AddIfNotNull(parameters, "start", Start);
+            AddIfNotNull(parameters, "_", ActivityStartId);
+            AddIfNotNull(parameters, "search", Search);
 
             var specialParameters = new List<string>();
-            if (FromDate.HasValue)
+            if (StartDate.HasValue)
             {
-                specialParameters.Add(String.Format("beginTimestamp>={0:s}", FromDate.Value));
+                specialParameters.Add("startDate=" + StartDate.Value.ToString("yyyy-MM-dd"));
             }
-            if (ToDate.HasValue)
+            if (EndDate.HasValue)
             {
-                specialParameters.Add(String.Format("endTimestamp<={0:s}", ToDate.Value));
+                specialParameters.Add("endDate=" + EndDate.Value.ToString("yyyy-MM-dd"));
             }
 
-            return BuildQueryString(parameters, specialParameters);
+            return BuildQueryString(specialParameters, parameters);
         }
 
         private void AddIfNotNull(NameValueCollection parameters, string name, object value)
@@ -54,13 +50,9 @@ namespace GarminExport.Activities.Model
             parameters.Add(name, value.ToString());
         }
 
-        private string BuildQueryString(NameValueCollection parameters, List<string> specialParameters)
+        private string BuildQueryString(List<string> specialParameters, NameValueCollection parameters)
         {
-            string queryString = "";
-            foreach (var key in parameters.AllKeys)
-            {
-                queryString += key + "=" + parameters[key] + "&";
-            }
+            string queryString = String.Join("&", parameters.AllKeys.Select(key => key + "=" + parameters[key]));
 
             if (specialParameters.Count == 0)
                 return queryString;
@@ -69,8 +61,7 @@ namespace GarminExport.Activities.Model
             if (String.IsNullOrEmpty(queryString))
                 return specialQueryString;
 
-            return queryString + "&" + specialQueryString;
+            return specialQueryString + "&" + queryString;
         }
     }
-
 }

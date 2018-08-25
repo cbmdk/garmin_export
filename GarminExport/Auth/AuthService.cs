@@ -36,16 +36,15 @@ namespace GarminExport.Auth
         {
             var signInResponse = PostLogin(null);
             var ticketUrl = ParseServiceTicketUrl(signInResponse);
-            bool success = ProcessTicket(ticketUrl);
-
-            //var activities = ConnectClient.Execute(new RestRequest("proxy/activity-search-service-1.0/json/activities?", Method.GET));
-
-            return success;
+            return ProcessTicket(ticketUrl);
         }
 
         private bool ProcessTicket(string ticketUrl)
         {
-            var uri = new Uri(ticketUrl.Replace(@"\/", @"/"));
+            //http:\/\/connect.garmin.com\/post-auth\/login?ticket=ST-xyz
+            var ticketUrlFormatted = ticketUrl.Replace(@"\/", @"/");
+            var ticketId = ticketUrlFormatted.Substring(ticketUrlFormatted.LastIndexOf("ticket=") + 7);
+            var uri = new Uri("https://connect.garmin.com/modern/?ticket=" + ticketId);
             var client = new RestClient(uri.Scheme + "://" + uri.Host)
             {
                 CookieContainer = Session.Cookies

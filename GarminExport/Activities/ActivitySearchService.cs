@@ -1,10 +1,8 @@
 ﻿using GarminExport.Auth;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GarminExport.Activities.Model;
 using Activity = GarminExport.Activities.Model.Activity;
-using System.Diagnostics;
 using RestSharp;
 
 namespace GarminExport.Activities
@@ -25,18 +23,18 @@ namespace GarminExport.Activities
             };
         }
 
-        public ActivitySearchResultsContainer FindActivities()
+        public List<Activity> FindActivities()
         {
             return FindActivities(new ActivitySearchFilters());
         }
 
-        public ActivitySearchResultsContainer FindActivities(ActivitySearchFilters filters)
+        public List<Activity> FindActivities(ActivitySearchFilters filters)
         {
-            var loginRequest = new RestRequest("/proxy/activity-search-service-1.2/json/activities?" + filters.ToQueryString(), Method.GET);
-            var response = ConnectClient.Execute(loginRequest);
-            return ActivitySearchResultsContainer.ParseJson(response.Content);
+            var uri = new Uri("https://connect.garmin.com/modern/proxy/activitylist-service/activities/search/activities?" + filters.ToQueryString());
+            var request = new RestRequest(uri, Method.GET);
+            var response = ConnectClient.Execute(request);
+            return Activity.ParseActivityList(response.Content);
         }
-
 
         public List<Activity> FindAllActivities()
         {
@@ -45,18 +43,23 @@ namespace GarminExport.Activities
 
         public List<Activity> FindAllActivities(ActivitySearchFilters filters)
         {
-            filters.Page = 0;
+            filters.Start = 0;
+            filters.Limit = 250;
+            filters.SortBy = "startLocal";
+            filters.SortOrder = "asc";
+
 
             var activities = new List<Activity>();
-            ActivitySearchResultsContainer results;
             do
             {
-                filters.Page++;
-                Console.WriteLine("Searching page {0}", filters.Page);
-                results = FindActivities(filters);
-                activities.AddRange(results.Results.Activities.Select(a => a.Activity));
-                Console.WriteLine("Found page {0} or {1}", results.Results.CurrentPage, results.Results.TotalPages);
-            } while (results.Results.CurrentPage < results.Results.TotalPages);
+                Console.WriteLine("Searching from start {0}", filters.Start);
+                var pageResult = FindActivities(filters);
+                if (pageResult.Count == 0)
+                    break;
+                activities.AddRange(pageResult);
+
+                filters.Start += pageResult.Count;
+            } while (true);
 
             return activities;
         }
