@@ -8,20 +8,25 @@ To run the .NET Core Runtime 2.0 must be installed.
 
 ## Run
 
-dotnet GarminExport.dll -u <<garmin login email address>> -p <<garmin login password>> 
+dotnet GarminExport.dll -u ***garmin login email address*** -p ***garmin login password***
 
 ### Command Line Parameter
 
-Required:
+**Required:**
 
--u						Garmin Connect email address
--p						Garmin Connect password
+| Command   |      Description      |
+|:----------|:-------------|
+| -u |Garmin Connect email address |
+| -p |Garmin Connect password   |
 
-Optional:
 
--o 						Relative or absolute output path; Default "./export"
---from-date				Start date in format yyy-mm-dd
---save-activity-result 	Saves the server response of an individual activity in the output folder as a file <<activityId.json>>>
+**Optional:**
+
+| Command   |      Description      |
+|:----------|:-------------|
+| -o |Relative or absolute output path; Default "./export" |
+| --from-date	 |Start date in format yyy-mm-dd   |
+| --save-activity-result |Saves the server response of an individual activity in the output folder as a file ***activityId***.json   |
 
 ## License
 
