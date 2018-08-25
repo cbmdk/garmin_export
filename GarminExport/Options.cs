@@ -19,7 +19,7 @@ namespace GarminExport
         [Option("from-date", Required = false, HelpText = "Format JJJJ-MM-TT")]
         public string FromDate { get; set; }
 
-        [Option("--save-activity-result", Required = false, DefaultValue = "false", HelpText = "Save the activity json from garmin for each activitx")]
+        [Option("save-activity-result", Required = false, DefaultValue = false, HelpText = "Save the activity json from garmin for each activitx")]
         public bool SaveActivityResult { get; set; }
     }
 }

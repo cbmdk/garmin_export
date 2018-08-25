@@ -21,7 +21,6 @@ namespace GarminExport.Activities
 
         public void DownloadActivity(Activity activity, String path)
         {
-            //https://connect.garmin.com/modern/proxy/download-service/files/wellness/2018-03-24?_=1521975308450
             Console.WriteLine("Download activty {0}", activity.ActivityId);
             WebRequest webRequest = WebRequest.Create("http://connect.garmin.com/proxy/download-service/files/activity/" + activity.ActivityId);
             HttpWebRequest httpWebRequest = webRequest as HttpWebRequest;

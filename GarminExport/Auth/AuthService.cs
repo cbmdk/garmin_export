@@ -34,9 +34,17 @@ namespace GarminExport.Auth
 
         public bool SignIn()
         {
-            var signInResponse = PostLogin(null);
-            var ticketUrl = ParseServiceTicketUrl(signInResponse);
-            return ProcessTicket(ticketUrl);
+   
+            try
+            {
+                var signInResponse = PostLogin(null);
+                var ticketUrl = ParseServiceTicketUrl(signInResponse);
+                return ProcessTicket(ticketUrl);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private bool ProcessTicket(string ticketUrl)
