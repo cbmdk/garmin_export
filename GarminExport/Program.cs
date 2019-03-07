@@ -16,11 +16,8 @@ namespace GarminExport
 {
     class Program
     {
-        private const string EXPORT_DIR = "./export";
-
         static void Main(string[] args)
         {
-
             var result = CommandLine.Parser.Default.ParseArguments<Options>(args);
             if (result.Errors.Any())
             {
@@ -74,7 +71,7 @@ namespace GarminExport
                 Console.WriteLine("Save activities json");
                 foreach (Activity activity in activities)
                 {
-                    var targetDirectory = FileUtils.CreateDirectoryIfNotExists(EXPORT_DIR);
+                    var targetDirectory = FileUtils.CreateDirectoryIfNotExists(options.OutputPath);
                     var json = JsonConvert.SerializeObject(activity);
                     string filePath = targetDirectory.FullName + "/" + activity.ActivityId + ".json";
                     using (FileStream streamWriter = File.Create(filePath))
@@ -93,7 +90,7 @@ namespace GarminExport
             {
                 try
                 {
-                    exportService.DownloadActivity(activity, EXPORT_DIR);
+                    exportService.DownloadActivity(activity, options.OutputPath);
                 }
                 catch (Exception ex)
                 {
