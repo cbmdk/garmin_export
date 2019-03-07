@@ -16,6 +16,9 @@ namespace GarminExport
 {
     class Program
     {
+        private const string ACTIVITY_DIR = "/activities";
+        private const string WELLNESS_DIR = "/wellness";
+
         static void Main(string[] args)
         {
             var result = CommandLine.Parser.Default.ParseArguments<Options>(args);
@@ -46,12 +49,30 @@ namespace GarminExport
             }
 
             DateTime fromDate = DateTime.MinValue;
-            if(options.FromDate != null)
+            if (options.FromDate != null)
             {
                 fromDate = DateTime.Parse(options.FromDate);
             }
 
-            ActivitySearchService activitySearchService = new ActivitySearchService(authService.Session);
+
+            DownloadService downloadService = new DownloadService(authService.Session);
+
+            if (options.SyncType.ToLower() == "all" || options.SyncType.ToLower() == "activites")
+            {
+                SnycActivities(options, fromDate, authService.Session, downloadService);
+            }
+            if (options.SyncType.ToLower() == "all" || options.SyncType.ToLower() == "wellness")
+            {
+                if (fromDate == null || fromDate <= DateTime.MinValue)
+                    fromDate = DateTime.Today;
+
+                SnycWellness(options, fromDate, downloadService);
+            }
+        }
+
+        private void SnycActivities(Options options, DateTime fromDate, Session session, DownloadService downloadService)
+        {
+            ActivitySearchService activitySearchService = new ActivitySearchService(session);
             var searchOptions = new ActivitySearchFilters
             {
                 StartDate = fromDate
@@ -71,7 +92,7 @@ namespace GarminExport
                 Console.WriteLine("Save activities json");
                 foreach (Activity activity in activities)
                 {
-                    var targetDirectory = FileUtils.CreateDirectoryIfNotExists(options.OutputPath);
+                    var targetDirectory = FileUtils.CreateDirectoryIfNotExists(options.OutputPath + ACTIVITY_DIR);
                     var json = JsonConvert.SerializeObject(activity);
                     string filePath = targetDirectory.FullName + "/" + activity.ActivityId + ".json";
                     using (FileStream streamWriter = File.Create(filePath))
@@ -85,17 +106,36 @@ namespace GarminExport
                 }
             }
 
-            DownloadService exportService = new DownloadService(authService.Session);
             foreach (var activity in activities)
             {
                 try
                 {
-                    exportService.DownloadActivity(activity, options.OutputPath);
+                    downloadService.DownloadActivity("http://connect.garmin.com/proxy/download-service/files/activity/" + activity.ActivityId, options.OutputPath + ACTIVITY_DIR, activity.StartTimeLocal);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Download activity failed:" + ex.Message);
                 }
+            }
+        }
+
+        private void SnycWellness(Options options, DateTime fromDate, DownloadService downloadService)
+        {
+            while (fromDate <= DateTime.Now)
+            {
+                string dateString = fromDate.ToString("yyyy-MM-dd");
+                string url = "https://connect.garmin.com/modern/proxy/download-service/files/wellness/" + dateString;
+
+                try
+                {
+                    downloadService.DownloadActivity(url, options.OutputPath + WELLNESS_DIR, fromDate);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Download welness failed:" + ex.Message);
+                }
+
+                fromDate = fromDate.AddDays(1);
             }
         }
     }

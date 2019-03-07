@@ -1,6 +1,6 @@
 # Garmin Export
 
-The program exports all activities from garmin connect in the original file format. Usually as .fit
+The program exports all activities and wellness data from garmin connect in the original file format. Usually as .fit
 
 ## Prerequisites
 
@@ -27,6 +27,7 @@ dotnet GarminExport.dll -u ***garmin login email address*** -p ***garmin login p
 | -o |Relative or absolute output path; Default "./export" |
 | --from-date	 |Start date in format yyy-mm-dd   |
 | --save-activity-result |Saves the server response of an individual activity in the output folder as a file ***activityId***.json   |
+| --type	 |Sync type: activites, wellness, all   |
 
 ## License
 

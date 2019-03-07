@@ -19,16 +19,16 @@ namespace GarminExport.Activities
             this.Session = session;
         }
 
-        public void DownloadActivity(Activity activity, String path)
+        public void DownloadActivity(string url, string outputPath, DateTime creationTime)
         {
-            Console.WriteLine("Download activty {0}", activity.ActivityId);
-            WebRequest webRequest = WebRequest.Create("http://connect.garmin.com/proxy/download-service/files/activity/" + activity.ActivityId);
+            Console.WriteLine("Download url {0}", url);
+            WebRequest webRequest = WebRequest.Create(url);
             HttpWebRequest httpWebRequest = webRequest as HttpWebRequest;
             httpWebRequest.CookieContainer = Session.Cookies;
 
             var response = httpWebRequest.GetResponse();
 
-            var targetDirectory = FileUtils.CreateDirectoryIfNotExists(path);
+            var targetDirectory = FileUtils.CreateDirectoryIfNotExists(outputPath);
 
             using (ZipInputStream inputStream = new ZipInputStream(response.GetResponseStream()))
             {
@@ -41,7 +41,6 @@ namespace GarminExport.Activities
                     string fileName = Path.GetFileName(theEntry.Name);
                     if (fileName != String.Empty)
                     {
-
                         string filePath = targetDirectory.FullName + "/" + theEntry.Name;
                         using (FileStream streamWriter = File.Create(filePath))
                         {
@@ -61,12 +60,12 @@ namespace GarminExport.Activities
                             }
                         }
 
-                        if (activity.StartTimeLocal != null)
+                        if (creationTime != null)
                         {
                             FileInfo fileInfo = new FileInfo(filePath)
                             {
-                                CreationTime = activity.StartTimeLocal,
-                                LastWriteTime = activity.StartTimeLocal
+                                CreationTime = creationTime,
+                                LastWriteTime = creationTime
                             };
                         }
                     }

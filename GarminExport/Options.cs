@@ -13,6 +13,9 @@ namespace GarminExport
         [Option('p', "password", Required = true, HelpText = "Garmin Connect password.")]
         public string Password { get; set; }
 
+        [Option('t', "type", Required = false, HelpText = "Sync type: activites, wellness, all", DefaultValue = "activites")]
+        public string SyncType { get; set; }
+
         [Option('o', "output", DefaultValue = "./export")]
         public string OutputPath { get; set; }
 
