@@ -72,11 +72,12 @@ namespace GarminExport.Auth
         private string PostLogin(string flowExecutionKey)
         {
             var request = BuildAuthRequest(Method.POST);
-            NameValueCollection formData = new NameValueCollection();
-            formData.Add("username", UserName);
-            formData.Add("password", Password);
-            formData.Add("embed", "true");
-            formData.Add("_eventId", "submit");
+            NameValueCollection formData = new NameValueCollection
+            {
+                { "username", UserName },
+                { "password", Password },
+                { "embed", "true" }
+            };
 
             string formDataStr="";
             foreach (var key in formData.AllKeys)
@@ -85,15 +86,15 @@ namespace GarminExport.Auth
             }
             var formDataBytes = Encoding.UTF8.GetBytes(formDataStr);
             request.AddParameter("application/x-www-form-urlencoded", formDataStr, ParameterType.RequestBody);
+            request.AddHeader("Referer", "https://sso.garmin.com/sso/signin");
             IRestResponse response = SSOClient.Execute(request);
             return response.Content;
         }
 
         private RestRequest BuildAuthRequest(Method method)
         {
-            var authRequest = new RestRequest("sso/login", method);
-            authRequest.AddQueryParameter("service", "http://connect.garmin.com/post-auth/login");
-            authRequest.AddQueryParameter("clientId", "demo");
+            var authRequest = new RestRequest("sso/signin", method);
+            authRequest.AddQueryParameter("service", "https://connect.garmin.com/modern/");
             return authRequest;
         }
 
